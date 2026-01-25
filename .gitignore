@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.env
+
+# Model weights (too large for git)
+*.pt
+*.pth
+*.onnx
+models/*.pt
+models/*.pth
+
+# Data files (download separately)
+data/*.mp4
+data/*.avi
+data/*.jpg
+data/*.png
+
+# Output files
+outputs/
+*.mp4
+test_*.png
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
