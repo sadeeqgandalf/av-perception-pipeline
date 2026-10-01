@@ -383,19 +383,21 @@ class FollowingDistanceAnalyzer:
     def analyze(
         self, 
         detections: List[Dict],
-        ego_speed_mps: Optional[float] = None
+        ego_speed_mps: Optional[float] = None,
+        frame_width: Optional[int] = None
     ) -> Dict:
         """
         Analyze following distance to lead vehicle.
         
         Args:
             detections: Object detections
-            ego_speed_mps: Actual ego vehicle speed if known
+            ego_speed_mps: Actual ego vehicle speed if known (0 means stopped)
+            frame_width: Width of the frame in pixels (default: 640)
         
         Returns:
             Following distance analysis
         """
-        speed = ego_speed_mps or self.assumed_speed_mps
+        speed = ego_speed_mps if ego_speed_mps is not None else self.assumed_speed_mps
         
         # Find vehicles ahead (cars, trucks, buses)
         vehicles = [
@@ -416,8 +418,9 @@ class FollowingDistanceAnalyzer:
         augmented = self.distance_estimator.estimate_all_distances(vehicles)
         
         # Simple ego lane detection (center 40% of frame)
-        frame_center = 320  # Assuming 640 width
-        lane_width = 256    # 40% of frame
+        width = frame_width or 640
+        frame_center = width / 2
+        lane_width = 0.4 * width
         
         in_lane = [
             v for v in augmented

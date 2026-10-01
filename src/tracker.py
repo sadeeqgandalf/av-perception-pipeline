@@ -15,15 +15,17 @@ This is CRITICAL for autonomous driving because you need to:
 3. Avoid counting the same car multiple times
 4. Make decisions based on trajectory, not just position
 
-ALGORITHM: ByteTrack (State-of-the-Art)
-=======================================
-We use a simplified ByteTrack implementation:
-1. Match high-confidence detections to existing tracks using IoU
-2. Match remaining detections to unmatched tracks
-3. Create new tracks for unmatched detections
-4. Remove tracks that haven't been seen for N frames
-
-This achieves near state-of-the-art performance without deep learning overhead.
+ALGORITHM: Greedy IoU tracker (SORT-style, no Kalman filter)
+============================================================
+1. Build a same-class IoU matrix between existing tracks and detections
+2. Greedily match the highest-IoU pairs above `iou_threshold`
+   (a single association pass; no low-score second pass as in ByteTrack,
+   no Hungarian assignment)
+3. Coast unmatched tracks with a constant-velocity prediction
+   (velocity = centre displacement since the last matched frame)
+4. Create new tracks for unmatched detections
+5. Report tracks with at least `min_hits` hits; delete tracks missed for
+   more than `max_age` consecutive frames
 """
 
 import numpy as np
@@ -154,8 +156,8 @@ class MultiObjectTracker:
     """
     Production-grade multi-object tracker.
     
-    Maintains identity of objects across frames using IoU matching
-    and Kalman-like velocity prediction.
+    Maintains identity of objects across frames using greedy IoU matching
+    and constant-velocity prediction (no Kalman filter).
     
     Features:
     - Handles occlusion (temporary disappearance)
@@ -282,7 +284,9 @@ class MultiObjectTracker:
                 
             max_iou = np.max(iou_matrix)
             
-            if max_iou < self.iou_threshold:
+            # max_iou <= 0 means nothing overlaps; without this check an
+            # iou_threshold <= 0 would loop forever on an all-zero matrix
+            if max_iou <= 0 or max_iou < self.iou_threshold:
                 break
             
             # Get indices of maximum
@@ -378,6 +382,8 @@ class MultiObjectTracker:
         self.tracks = []
         self.next_track_id = 1
         self.frame_count = 0
+        self.total_tracks_created = 0
+        self.total_tracks_finished = 0
 
 
 class CollisionRiskAssessor:
@@ -462,7 +468,9 @@ class CollisionRiskAssessor:
         # 5. Calculate Time to Collision (simplified)
         if track.velocity[1] > 5:  # Moving towards us
             # Estimate based on position and velocity
-            remaining_distance = self.frame_height - track.bbox[3]
+            # Pixels between box bottom and image bottom; clamp at 0 because a
+            # coasting (predicted) box can extend past the frame edge
+            remaining_distance = max(0, self.frame_height - track.bbox[3])
             ttc = remaining_distance / track.velocity[1] if track.velocity[1] > 0 else 999
         else:
             ttc = 999  # Not approaching

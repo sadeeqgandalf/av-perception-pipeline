@@ -31,7 +31,7 @@ from .pipeline import PerceptionPipeline
 from .pipeline_pro import PerceptionPipelinePro
 
 __version__ = "2.0.0"
-__author__ = "Your Name"
+__author__ = "sadeeqgandalf"
 
 __all__ = [
     # Detection

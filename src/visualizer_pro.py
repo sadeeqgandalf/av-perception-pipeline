@@ -14,12 +14,14 @@ import numpy as np
 from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass
 
-# Import our modules
+# Import our modules (relative when imported as the `src` package,
+# bare when run as a script from inside src/)
 try:
+    from .tracker import Track, CollisionRiskAssessor
+    from .distance_estimator import DistanceEstimator
+except ImportError:
     from tracker import Track, CollisionRiskAssessor
     from distance_estimator import DistanceEstimator
-except ImportError:
-    Track = None
 
 
 class VisualizerPro:

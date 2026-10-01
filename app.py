@@ -172,7 +172,7 @@ def main():
             
             with col1:
                 st.subheader("Original")
-                st.image(cv2.cvtColor(image, cv2.COLOR_BGR2RGB), use_column_width=True)
+                st.image(cv2.cvtColor(image, cv2.COLOR_BGR2RGB), use_container_width=True)
             
             # Process
             with st.spinner("Processing..."):
@@ -182,7 +182,7 @@ def main():
             
             with col2:
                 st.subheader("Detected")
-                st.image(cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB), use_column_width=True)
+                st.image(cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB), use_container_width=True)
             
             # Metrics
             st.subheader("📊 Detection Results")
@@ -215,7 +215,7 @@ def main():
             st.subheader("Example Output")
             st.image("https://raw.githubusercontent.com/ultralytics/yolov5/master/data/images/bus.jpg", 
                     caption="Example: Vehicle and pedestrian detection",
-                    use_column_width=True)
+                    use_container_width=True)
     
     elif mode == "🎥 Upload Video":
         st.header("Video Analysis")
