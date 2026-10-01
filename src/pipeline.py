@@ -39,11 +39,18 @@ from pathlib import Path
 from typing import Optional
 from tqdm import tqdm
 
-# Import our modules
-from detector import ObjectDetector
-from lane_detector import LaneDetector
-from visualizer import Visualizer
-from metrics import PerformanceMetrics
+# Import our modules (relative when imported as the `src` package,
+# bare when run as a script from inside src/)
+try:
+    from .detector import ObjectDetector
+    from .lane_detector import LaneDetector
+    from .visualizer import Visualizer
+    from .metrics import PerformanceMetrics
+except ImportError:
+    from detector import ObjectDetector
+    from lane_detector import LaneDetector
+    from visualizer import Visualizer
+    from metrics import PerformanceMetrics
 
 
 class PerceptionPipeline:

@@ -4,8 +4,9 @@ torchvision>=0.15.0
 ultralytics>=8.0.0          # YOLOv8
 
 # Computer Vision
+# GUI build: pipeline.py / pipeline_pro.py call cv2.imshow by default.
+# Do not also install opencv-python-headless (both provide the cv2 module).
 opencv-python>=4.8.0
-opencv-python-headless>=4.8.0
 
 # Data Processing
 numpy>=1.24.0
@@ -18,7 +19,7 @@ seaborn>=0.12.0
 plotly>=5.15.0
 
 # Demo App
-streamlit>=1.28.0
+streamlit>=1.40.0         # st.image(use_container_width=...) needs >=1.40
 
 # Utilities
 tqdm>=4.65.0

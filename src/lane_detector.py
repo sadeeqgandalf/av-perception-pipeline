@@ -218,8 +218,9 @@ class LaneDetector:
         height, width = shape[:2]
         center_x = width // 2
         
-        for line in lines:
-            x1, y1, x2, y2 = line[0]
+        # OpenCV 4.x returns shape (N, 1, 4); OpenCV 5.x returns (N, 4)
+        for line in np.asarray(lines).reshape(-1, 4):
+            x1, y1, x2, y2 = line
             
             # Skip nearly horizontal lines (not lane lines)
             if abs(y2 - y1) < 10:
@@ -234,10 +235,10 @@ class LaneDetector:
             
             # Negative slope and on left side = left lane
             if slope < 0 and x1 < center_x and x2 < center_x:
-                left_lines.append(line[0])
+                left_lines.append(line)
             # Positive slope and on right side = right lane
             elif slope > 0 and x1 > center_x and x2 > center_x:
-                right_lines.append(line[0])
+                right_lines.append(line)
         
         return left_lines, right_lines
     

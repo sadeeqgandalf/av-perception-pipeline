@@ -27,13 +27,22 @@ from pathlib import Path
 from typing import Optional, Dict, List
 from tqdm import tqdm
 
-# Import all our modules
-from detector import ObjectDetector
-from lane_detector import LaneDetector
-from tracker import MultiObjectTracker, CollisionRiskAssessor
-from distance_estimator import DistanceEstimator, FollowingDistanceAnalyzer
-from visualizer_pro import VisualizerPro
-from metrics import PerformanceMetrics
+# Import all our modules (relative when imported as the `src` package,
+# bare when run as a script from inside src/)
+try:
+    from .detector import ObjectDetector
+    from .lane_detector import LaneDetector
+    from .tracker import MultiObjectTracker, CollisionRiskAssessor
+    from .distance_estimator import DistanceEstimator, FollowingDistanceAnalyzer
+    from .visualizer_pro import VisualizerPro
+    from .metrics import PerformanceMetrics
+except ImportError:
+    from detector import ObjectDetector
+    from lane_detector import LaneDetector
+    from tracker import MultiObjectTracker, CollisionRiskAssessor
+    from distance_estimator import DistanceEstimator, FollowingDistanceAnalyzer
+    from visualizer_pro import VisualizerPro
+    from metrics import PerformanceMetrics
 
 
 class PerceptionPipelinePro:
@@ -205,7 +214,9 @@ class PerceptionPipelinePro:
             }
             for t in tracks
         ]
-        following_analysis = self.following_analyzer.analyze(track_dicts)
+        following_analysis = self.following_analyzer.analyze(
+            track_dicts, frame_width=frame.shape[1]
+        )
         
         # Step 7: Get current metrics
         current_metrics = self.metrics.get_current_metrics()
@@ -265,9 +276,13 @@ class PerceptionPipelinePro:
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         fps = cap.get(cv2.CAP_PROP_FPS) or 30
         
-        # Update risk assessor with frame dimensions
-        self.risk_assessor.frame_height = height
-        self.risk_assessor.frame_width = width
+        # Update risk assessors (pipeline + visualizer) with frame dimensions
+        for assessor in (self.risk_assessor, self.visualizer.risk_assessor):
+            if assessor is None:
+                continue
+            assessor.frame_height = height
+            assessor.frame_width = width
+            assessor.ego_lane_center = width // 2
         
         print(f"\n{'='*60}")
         print("VIDEO PROPERTIES")

@@ -172,7 +172,7 @@ def main():
             
             with col1:
                 st.subheader("Original")
-                st.image(cv2.cvtColor(image, cv2.COLOR_BGR2RGB), use_column_width=True)
+                st.image(cv2.cvtColor(image, cv2.COLOR_BGR2RGB), use_container_width=True)
             
             # Process
             with st.spinner("Processing..."):
@@ -182,7 +182,7 @@ def main():
             
             with col2:
                 st.subheader("Detected")
-                st.image(cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB), use_column_width=True)
+                st.image(cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB), use_container_width=True)
             
             # Metrics
             st.subheader("📊 Detection Results")
@@ -215,7 +215,7 @@ def main():
             st.subheader("Example Output")
             st.image("https://raw.githubusercontent.com/ultralytics/yolov5/master/data/images/bus.jpg", 
                     caption="Example: Vehicle and pedestrian detection",
-                    use_column_width=True)
+                    use_container_width=True)
     
     elif mode == "🎥 Upload Video":
         st.header("Video Analysis")
@@ -274,71 +274,24 @@ def main():
     
     elif mode == "📊 View Metrics":
         st.header("Performance Metrics")
-        
+
+        st.info(
+            "No benchmark numbers are claimed here yet. Every figure this app shows is measured live "
+            "on your machine, for example the inference time in the image mode."
+        )
         st.markdown("""
-        These metrics demonstrate the system's capability for real-time autonomous driving applications.
+        **How to measure the real numbers**
+
+        | Metric | How | Needs |
+        |---|---|---|
+        | Inference speed (FPS) per YOLOv8 size | `cd src && python model_benchmark.py` | YOLOv8 weights (downloaded on first run) and your GPU/CPU |
+        | Detection mAP | Evaluate on a labelled split (for example BDD100K val) with Ultralytics' `val` | Ground-truth boxes |
+        | Tracking quality (IDF1, ID switches) | Run TrackEval on tracker output | Ground-truth track IDs (for example KITTI tracking or BDD100K MOT) |
+        | Lane accuracy | Compare fitted lanes with lane labels | A lane benchmark such as TuSimple or CULane |
+
+        Report each result with the dataset, split, hardware and commit, so it can be reproduced.
         """)
-        
-        # Key metrics
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            st.metric(
-                "Detection mAP",
-                "0.87",
-                "+0.02 vs baseline",
-                help="Mean Average Precision on COCO validation set"
-            )
-        
-        with col2:
-            st.metric(
-                "Inference Speed",
-                "28 FPS",
-                "✅ Real-time",
-                help="Frames per second on RTX 3060"
-            )
-        
-        with col3:
-            st.metric(
-                "Lane Detection",
-                "94.2%",
-                "+4.2% vs baseline",
-                help="Accuracy on TuSimple benchmark"
-            )
-        
-        # Charts
-        st.subheader("Performance Comparison")
-        
-        import pandas as pd
-        
-        # FPS comparison
-        fps_data = pd.DataFrame({
-            'Model': ['YOLOv8n', 'YOLOv8s', 'YOLOv8m (Ours)', 'YOLOv8l', 'YOLOv8x'],
-            'FPS': [45, 35, 28, 18, 12],
-            'mAP': [0.72, 0.78, 0.87, 0.89, 0.91]
-        })
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.subheader("Speed vs Accuracy Trade-off")
-            st.bar_chart(fps_data.set_index('Model')['FPS'])
-        
-        with col2:
-            st.subheader("Detection Accuracy (mAP)")
-            st.bar_chart(fps_data.set_index('Model')['mAP'])
-        
-        # Class-wise performance
-        st.subheader("Detection Performance by Class")
-        
-        class_data = pd.DataFrame({
-            'Class': ['Car', 'Truck', 'Person', 'Bicycle', 'Traffic Light'],
-            'Precision': [0.94, 0.89, 0.91, 0.85, 0.88],
-            'Recall': [0.92, 0.87, 0.89, 0.82, 0.85]
-        })
-        
-        st.dataframe(class_data.style.highlight_max(axis=0))
-    
+
     else:  # About
         st.header("About This Project")
         
@@ -355,29 +308,29 @@ def main():
         | Object Detection | YOLOv8 (PyTorch) |
         | Lane Detection | OpenCV + Custom Algorithm |
         | Visualization | OpenCV + Streamlit |
-        | Deployment | Docker + FastAPI |
+        | Web demo | Streamlit |
         
         ## 📈 Key Features
         
-        - **Real-time Processing**: 28+ FPS on consumer GPU
+        - **Live timing**: per-frame inference time is measured and shown, never assumed
         - **Multi-class Detection**: Cars, trucks, pedestrians, cyclists
         - **Lane Tracking**: Polynomial curve fitting with temporal smoothing
-        - **Production Ready**: Docker deployment, API endpoints
+        - **Tracking**: IoU-based association with constant-velocity coasting, plus distance and time-to-collision estimates
+        - **Tested**: 24 regression tests (`pytest tests/`)
         
         ## 🎓 Skills Demonstrated
         
         - Deep Learning (PyTorch, YOLO)
         - Computer Vision (OpenCV)
         - System Design (Pipeline architecture)
-        - MLOps (Docker, metrics tracking)
+        - Testing and measurement discipline (regression tests, reproducible benchmarks)
         - Software Engineering (Clean code, documentation)
         
         ## 📫 Contact
         
         Built for demonstrating autonomous vehicle perception capabilities.
         
-        [GitHub](https://github.com/YOUR_USERNAME) | 
-        [LinkedIn](https://linkedin.com/in/YOUR_PROFILE)
+        [GitHub](https://github.com/sadeeqgandalf)
         """)
 
 
