@@ -2,7 +2,6 @@
 
 Monocular dashcam perception in Python: YOLOv8 detection, IoU-based multi-object tracking with persistent IDs, classical lane detection, size/perspective distance estimation, and a heuristic collision-risk score, rendered onto an annotated video.
 
-> Repository name: `sadeeqgandalf-autonomous-vehicle-Perception`. "AV Perception Pipeline" is the suggested display title.
 
 ```mermaid
 flowchart LR
@@ -46,8 +45,8 @@ Python, PyTorch, Ultralytics YOLOv8, OpenCV, NumPy, tqdm, Streamlit (demo app). 
 No Python version is pinned in the repo; use a Python 3 version supported by your installed PyTorch and Ultralytics.
 
 ```bash
-git clone https://github.com/sadeeqgandalf/sadeeqgandalf-autonomous-vehicle-Perception.git
-cd sadeeqgandalf-autonomous-vehicle-Perception
+git clone https://github.com/sadeeqgandalf/av-perception-pipeline.git
+cd av-perception-pipeline
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 
@@ -109,15 +108,20 @@ What the tracker does (`src/tracker.py`):
 
 Limitations and next steps:
 
-- Despite the module docstring, this is not ByteTrack: there is no second association pass for low-confidence detections, no Kalman filter (constant-velocity extrapolation only) and no appearance re-identification. IDs can switch after long occlusions or when objects cross.
+- This is not ByteTrack: there is no second association pass for low-confidence detections, no Kalman filter (constant-velocity extrapolation only) and no appearance re-identification. IDs can switch after long occlusions or when objects cross.
 - Distance uses assumed camera parameters (focal length 500 px, 1.2 m height) and class size priors; treat values as rough.
 - The risk score and time-to-collision are heuristics in pixel space, not physical TTC, and ego speed is assumed.
 - Next steps: Kalman filtering, two-stage low-confidence association, appearance embeddings, camera calibration, and quantitative evaluation with MOT metrics.
+
+## Tests
+
+`pip install pytest && pytest tests/` runs 24 regression tests (IoU and greedy matching, track lifecycle, the flat-ground distance model, time-to-collision edge cases, following distance at any frame width, and both OpenCV 4 and 5 line formats in the lane detector). They need no model weights.
 
 ## Credits and licences
 
 - [Ultralytics YOLOv8](https://github.com/ultralytics/ultralytics) with pretrained COCO weights, downloaded at run time (not stored in this repo). Ultralytics is released under AGPL-3.0 with a separate enterprise licence; check their terms before commercial use.
 - BDD-A (Berkeley DeepDrive Attention) GPS metadata in `data/BDDA/`. Its licence is not stated in this repo; refer to the dataset's own terms.
+- This project's own code is MIT licensed (see `LICENSE`).
 - This repository has no LICENSE file.
 
 ## Related work
